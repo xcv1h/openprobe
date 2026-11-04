@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>buildings · openprobe</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/buildings.js" defer></script>
+</head>
+<body>
+  <header>
+    <a href="buildings.html">openprobe</a>
+    <nav>
+      <a href="buildings.html" aria-current="page">buildings</a>
+      <a href="probe.html">probe</a>
+      <a href="index.html">log out</a>
+    </nav>
+  </header>
+
+  <!-- Two columns on wide screens: the list, and the activity log beside it -->
+  <main class="narrow split">
+    <div>
+      <h1>buildings</h1>
+
+      <!-- One sentence instead of a dashboard, e.g. "2 need attention · 1 unsent scan" -->
+      <p id="overview" class="overview"></p>
+      <div id="probes" class="probes"></div>
+
+      <div id="filter-block" class="filter">
+        <label for="filter">filter</label>
+        <input id="filter" type="search" autocomplete="off" placeholder="building name">
+      </div>
+
+      <!-- role="list": Safari stops announcing a <ul> as a list once list-style is removed -->
+      <ul id="list" class="buildings" role="list"></ul>
+
+      <p id="no-match" aria-live="polite"></p>
+
+      <p id="empty" hidden>
+        no buildings yet. add one in the PocketBase admin panel, then reload this page.
+      </p>
+    </div>
+
+    <!-- Wide screens only: hidden on phones by the CSS -->
+    <aside class="log" aria-labelledby="log-title">
+      <h2 id="log-title">activity</h2>
+      <ol id="log" class="log-list" role="list"></ol>
+    </aside>
+  </main>
+
+  <!-- One building row. buildings.js copies this once per building and fills it in. -->
+  <template id="row">
+    <li>
+      <details>
+        <summary>
+          <span class="line">
+            <span class="marker" aria-hidden="true">▸</span>
+            <span class="name"></span>
+            <span class="status"><span class="icon" aria-hidden="true"></span> <span class="word"></span></span>
+            <span class="when"></span>
+          </span>
+        </summary>
+        <div class="more">
+          <dl></dl>
+          <p class="actions">
+            <a class="open">open last scan</a>
+            <a class="start primary">start new scan</a>
+          </p>
+        </div>
+      </details>
+    </li>
+  </template>
+</body>
+</html>

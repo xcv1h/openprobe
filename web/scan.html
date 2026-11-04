@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Building B · openprobe</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <a href="buildings.html">openprobe</a>
+    <nav>
+      <a href="buildings.html">buildings</a>
+      <a href="probe.html">probe</a>
+      <a href="index.html">log out</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1><a href="buildings.html">buildings</a> / Building B</h1>
+    <p class="live">● live</p>
+
+    <!-- One row per record in `devices` where scan = this scan.
+         A row older than its CDP holdtime gets class="stale". Placeholder rows. -->
+    <div class="scroll">
+      <table>
+        <thead>
+          <tr>
+            <th>device_id</th><th>local_port</th><th>platform</th><th>version</th>
+            <th>mgmt_ip</th><th>native_vlan</th><th>capabilities</th><th>updated</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>SW-ACCESS-01</td><td>GigabitEthernet1/0/24</td><td>cisco WS-C2960X-24TS-L</td><td>15.2(7)E8</td>
+            <td>10.0.0.2</td><td>1</td><td>S I</td><td class="seen">12s ago</td>
+          </tr>
+          <tr class="stale">
+            <td>RTR-EDGE-01</td><td>GigabitEthernet0/1</td><td>cisco CISCO1941/K9</td><td>15.7(3)M8</td>
+            <td>10.0.0.1</td><td>1</td><td>R B S I</td><td class="seen">6m ago</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </main>
+</body>
+</html>

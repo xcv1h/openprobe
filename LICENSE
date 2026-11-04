@@ -1,0 +1,12 @@
+OpenProbe is licensed per directory. Full texts are in LICENSES/.
+
+firmware/   GPL-3.0-or-later
+backend/    AGPL-3.0-or-later
+web/        AGPL-3.0-or-later
+hardware/   CERN-OHL-S-2.0
+docs/       CC-BY-SA-4.0
+
+Every file carries an SPDX header; if a header and this summary
+disagree, the header is authoritative.
+
+Copyright (C) 2026 Tymofii Zhurida

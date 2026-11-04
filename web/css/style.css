@@ -1,0 +1,216 @@
+:root {
+  --bg: #0A0A0A;
+  --fg: #EBEBEB;
+  --red: #FF2A2A;
+  --dim: rgba(235, 235, 235, 0.55);   /* --fg faded: labels, secondary text */
+  --rule: rgba(235, 235, 235, 0.15);  /* --fg faded more: hairlines */
+
+  /* Status colours: the only colour on the page. Always shown with an icon and a word too. */
+  --status-down: var(--red);
+  --status-stale: var(--fg);
+  --status-ok: var(--dim);
+
+  color-scheme: dark;                  /* dark scrollbars and form controls */
+}
+
+* { box-sizing: border-box; }
+
+/* Without this, a rule like "display: flex" would beat the hidden attribute */
+[hidden] { display: none !important; }
+
+html {
+  background: var(--bg);
+  color: var(--fg);
+  font: 16px/1.5 ui-monospace, Menlo, Consolas, "DejaVu Sans Mono", monospace;   /* 16px also stops iOS zooming into inputs */
+}
+
+/* Big monitors: 16px monospace looks tiny there */
+@media (min-width: 88rem) {
+  html { font-size: 18px; }
+}
+
+body { margin: 0; }
+
+a { color: inherit; text-underline-offset: 3px; }
+
+/* Keyboard focus: a clear outline on anything you can tab to */
+:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+
+/* The header runs edge to edge; the page content is a centred column below it */
+header { padding: 0 16px; }
+@media (min-width: 48rem) {
+  header { padding: 0 32px; }   /* a little more air on big screens */
+}
+main {
+  max-width: 80rem;   /* room for the device table on scan.html */
+  margin: 0 auto;
+  padding: 0 16px;
+}
+main.narrow { max-width: calc(50ch + 32px); }   /* list pages: just wide enough for one row, plus the gutters */
+
+/* Header: name on the left, pages on the right */
+header {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0 16px;
+  padding-top: 6px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid var(--rule);
+}
+header a { text-decoration: none; padding: 10px 0; }   /* 24px line + 20px padding = 44px tap target */
+nav { display: flex; gap: 16px; }
+nav a { color: var(--dim); }
+nav a[aria-current="page"] { color: var(--fg); }
+
+h1 { font-size: 1.4rem; margin: 32px 0 8px; }
+h2 { font-size: 1rem; font-weight: normal; color: var(--dim); margin: 32px 0 8px; }
+
+/* Tables: a hairline under each row, nothing else */
+.scroll { overflow-x: auto; }   /* a wide table scrolls sideways on a phone, the page doesn't */
+table { border-collapse: collapse; margin-top: 16px; }   /* as wide as its columns, not the screen */
+th, td {
+  text-align: left;
+  white-space: nowrap;
+  padding: 8px 24px 8px 0;
+  border-bottom: 1px solid var(--rule);
+}
+th { font-weight: normal; color: var(--dim); }
+
+/* Red: a device older than its CDP holdtime, or something live */
+.stale td { color: var(--dim); }
+.stale .seen, .live { color: var(--red); }
+
+/* Probe page */
+dl { display: grid; grid-template-columns: max-content 1fr; gap: 8px 24px; margin: 24px 0 0; }
+dt { color: var(--dim); }
+dd { margin: 0; }
+#console {
+  font: inherit;          /* <pre> would otherwise drop to the browser's small default monospace */
+  min-height: 16em;
+  margin: 0;
+  padding: 16px 0;
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+
+/* Login page */
+.login { max-width: 24rem; padding-top: 20vh; }
+form { display: grid; gap: 8px; }
+label { color: var(--dim); }
+input {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: 0;
+  border-bottom: 1px solid var(--rule);
+  padding: 10px 0;   /* 44px tall */
+  margin-bottom: 16px;
+}
+input:focus { outline: none; border-bottom-color: var(--fg); }
+button {
+  justify-self: start;
+  font: inherit;
+  color: var(--bg);
+  background: var(--fg);
+  border: 0;
+  padding: 8px 16px;
+  cursor: pointer;
+}
+
+/* Buildings page */
+.overview { color: var(--dim); margin: 0; }
+
+/* Probe lines under the overview: online in normal text, offline dimmed */
+.probes { margin-bottom: 24px; }
+.probes p { margin: 0; }
+.probes .offline { color: var(--dim); }
+#no-match { color: var(--dim); }
+
+/* Filter: label and input on one line, like a prompt */
+.filter { display: flex; align-items: center; gap: 1ch; border-bottom: 1px solid var(--dim); }
+.filter:focus-within { border-bottom-color: var(--fg); }
+.filter label { color: var(--dim); }
+.filter input { flex: 1; min-width: 0; border: 0; margin: 0; }
+.filter input::placeholder { color: var(--dim); }
+
+/* The list: rows separated by a hairline, no boxes */
+.buildings { list-style: none; margin: 0; padding: 0; }
+.buildings li { border-bottom: 1px solid var(--rule); }
+
+.buildings summary { list-style: none; cursor: pointer; }
+.buildings summary::-webkit-details-marker { display: none; }   /* Safari's own arrow */
+
+/* The collapsed row: four columns, arrow | name | status | time.
+   It lives in an inner span because older Safari ignores display: grid on <summary> itself. */
+.line {
+  display: grid;
+  grid-template-columns: 1ch minmax(0, 1fr) 7ch 7ch;   /* the name gets whatever is left: 32ch on a desktop, less on a phone */
+  gap: 1ch;           /* monospace, so everything sits on a character grid */
+  align-items: center;
+  min-height: 48px;   /* tap target */
+}
+.marker { color: var(--dim); transition: transform 0.15s; }
+details[open] .marker { transform: rotate(90deg); }   /* ▸ turns into ▾ */
+.name {
+  overflow: hidden;   /* a long name ends in "…" instead of widening the page */
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.line .status, .when { white-space: nowrap; }
+.line .status.never { grid-column: span 2; }   /* "never scanned" also takes the empty time column */
+.when { text-align: right; }
+.when time { color: var(--dim); }   /* "3d ago" is dimmed, "● live" stays normal text */
+
+.status.down  { color: var(--status-down); }
+.status.stale { color: var(--status-stale); }
+.status.ok    { color: var(--status-ok); }
+.status.never { color: var(--dim); }
+
+/* "● live" breathes slowly while a probe is scanning */
+@keyframes pulse { 50% { opacity: 0.3; } }
+.pulse { animation: pulse 2s ease-in-out infinite; }
+
+/* The opened part, indented to line up with the building name (1ch marker + 1ch gap) */
+.more { padding: 0 0 16px 2ch; }
+.more dl { margin: 0; gap: 4px 1ch; grid-template-columns: 10ch 1fr; }   /* fixed label width, same in every row */
+.more dd { overflow-wrap: anywhere; }   /* a long address wraps instead of scrolling sideways */
+
+.actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 16px 0 0; }
+.actions a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 0 16px;
+  border: 1px solid var(--dim);
+  text-decoration: none;
+}
+.actions a.primary { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+
+/* Activity log: hidden on phones, beside the list on wide screens */
+.log { display: none; }
+@media (min-width: 72rem) {
+  main.split {
+    max-width: calc(50ch + 6ch + 56ch + 32px);   /* list + gap + log + gutters */
+    display: grid;
+    grid-template-columns: 50ch 56ch;
+    column-gap: 6ch;
+    align-items: start;
+  }
+  .log { display: block; }
+}
+.log-list { list-style: none; margin: 0; padding: 0; }
+.log-list li {
+  display: grid;
+  grid-template-columns: 7ch 9ch minmax(0, 1fr) 10ch;   /* time | who | what | result */
+  gap: 2ch;
+  padding: 4px 0;
+  white-space: nowrap;
+}
+.log-list .at, .log-list .who { color: var(--dim); }
+.log-list .what { overflow: hidden; text-overflow: ellipsis; }
+
+@media (prefers-reduced-motion: reduce) {
+  .marker { transition: none; }
+  .pulse { animation: none; }
+}

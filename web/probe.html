@@ -1,0 +1,34 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>probe · openprobe</title>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header>
+    <a href="buildings.html">openprobe</a>
+    <nav>
+      <a href="buildings.html">buildings</a>
+      <a href="probe.html" aria-current="page">probe</a>
+      <a href="index.html">log out</a>
+    </nav>
+  </header>
+
+  <main>
+    <h1>probe</h1>
+
+    <!-- Placeholder values. -->
+    <dl>
+      <dt>status</dt>     <dd class="live">● online</dd>
+      <dt>bound scan</dt> <dd><a href="scan.html">Building B</a></dd>
+      <dt>last frame</dt> <dd>12s ago, SW-ACCESS-01 GigabitEthernet1/0/24</dd>
+    </dl>
+
+    <h2>console</h2>
+    <!-- xterm.js goes here. Bytes come over the reverse WebSocket relayed by the PocketBase host. -->
+    <pre id="console">SW-ACCESS-01&gt;</pre>
+  </main>
+</body>
+</html>
