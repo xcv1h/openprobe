@@ -99,7 +99,7 @@ openprobe keeps the WAYSOD core — `ground`, `ink`, `signal` — and stays quie
 ### Content fundamentals
 
 - The name is **openprobe**, always lowercase. No logo exists: set the name in `wordmark`, never draw a mark.
-- The pitch, and the first thing a technician should understand: **the console password is all it needs.** Say it on the login page and on the scan setup screen. Don't mention Ethernet unless the technician turns it on.
+- The pitch, and the first thing a technician should understand: **the console password is all it needs.** Say it on the login page and nowhere else: it's a pitch for someone deciding to use openprobe, not something a technician needs to read again at every scan. Don't mention Ethernet unless the technician turns it on.
 - Voice: terse, literal, operator to operator. Say what happened: "3 neighbors", "SW-ACCESS-01.lab.local" — not "we found some devices!".
 - An instruction is one sentence, second person, verb first: "plug the rollover cable into the switch's console port." No "please", no "we".
 - Everything is lowercase except what a device prints, which stays exactly as printed: `SW-ACCESS-01`, `GigabitEthernet1/0/24`, `WS-C2960X-24TS-L`.
@@ -153,7 +153,7 @@ openprobe keeps the WAYSOD core — `ground`, `ink`, `signal` — and stays quie
 
 `start new scan` opens the walk. This is where openprobe holds the technician's hand, so each screen answers one question: what do I do now?
 
-1. **setup** — building (already filled in), probe (with its StatusMark; an offline probe can't be picked, and the screen says why), console password: `none` / `one for all` / `ask per switch`. Under the form, one line: "the console password is all it needs." Primary action: `start scan`.
+1. **setup** — building (already filled in), probe (with its StatusMark; an offline probe can't be picked, and the screen says why), console password: `none` / `one for all` / `ask per switch`. No pitch here: the technician already knows. Primary action: `start scan`.
 2. **stop** — one screen per switch: StopSteps. The ask on top in `title`, the steps under it. The ask changes with the step:
 
    | step | mark | ask |
