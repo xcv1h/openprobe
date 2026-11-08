@@ -1,3 +1,7 @@
+// SPDX-FileCopyrightText: 2026 Tymofii Zhurida (xcv1h) zhuridatimofii@gmail.com
+//
+// SPDX-License-Identifier: AGPL-3.0-or-later
+
 // Buildings page: one collapsible row per building, trouble sorted to the top.
 
 const MINUTE = 60 * 1000;      // milliseconds, the unit Date.now() uses

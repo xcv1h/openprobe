@@ -1,0 +1,6 @@
+version = 1
+
+[[annotations]]
+path = ["LICENSE", "README.md", "**/.gitkeep"]
+SPDX-FileCopyrightText = "2026 Tymofii Zhurida (xcv1h) zhuridatimofii@gmail.com"
+SPDX-License-Identifier = "CC-BY-SA-4.0"
