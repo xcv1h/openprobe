@@ -112,7 +112,9 @@ const MARKS = {
 
 // Everything the walk has done so far.
 const walk = {
-  building: '',
+  building: '',     // its name
+  isNew: false,     // added during this walk, not in the database yet
+  where: '',        // only for a new building
   probe: '',
   mode: 'one',      // console password: 'none', 'one' (one for all) or 'ask' (ask per switch)
   index: 0,         // which switch in `switches` we are at; the stop number is index + 1
@@ -203,10 +205,110 @@ const setupForm = document.getElementById('setup-form');
 const onePasswordField = document.getElementById('one-password-field');
 const onePassword = document.getElementById('one-password');
 
-// Building from ?building=b1, as linked from the buildings page.
+const picker = document.getElementById('picker');
+const picked = document.getElementById('picked');
+const buildingFilter = document.getElementById('building-filter');
+const buildingList = document.getElementById('building-list');
+const buildingNone = document.getElementById('building-none');
+const addButton = document.getElementById('add-building');
+const whereField = document.getElementById('where-field');
+
+// One radio per building, A to Z. A new building's value is 'new'.
+function buildingChoice(id, name, isNew) {
+  const label = document.createElement('label');
+  const input = document.createElement('input');
+  label.className = 'choice';
+  label.dataset.name = name;   // what the filter matches against, and the name shown when picked
+  input.type = 'radio';
+  input.name = 'building';
+  input.value = id;
+  label.append(input, ' ' + name);
+  if (isNew) {
+    const tag = document.createElement('span');
+    tag.className = 'new';
+    tag.textContent = ' · new';
+    label.append(tag);
+  }
+  return label;
+}
+
+buildings.sort((a, b) => a.name.localeCompare(b.name));
+for (const b of buildings) buildingList.append(buildingChoice(b.id, b.name, false));
+
+function chosenBuilding() {
+  return buildingList.querySelector('input:checked');   // null until one is picked
+}
+
+// The closed accordion's line shows the pick. A new building also gets the "where" field.
+function updatePicked() {
+  const chosen = chosenBuilding();
+  picked.textContent = chosen ? chosen.parentElement.textContent.trim() : 'choose a building';
+  picked.classList.toggle('placeholder', !chosen);
+  whereField.hidden = !chosen || chosen.value !== 'new';
+}
+
+// Hides buildings whose name doesn't contain the typed text. Nothing left: offer to add it.
+function filterBuildings() {
+  const query = buildingFilter.value.trim();
+  let shown = 0;
+  for (const label of buildingList.children) {
+    label.hidden = !label.dataset.name.toLowerCase().includes(query.toLowerCase());
+    if (!label.hidden) shown++;
+  }
+  const offer = query !== '' && shown === 0;
+  buildingNone.hidden = !offer;
+  addButton.hidden = !offer;
+  buildingNone.textContent = offer ? `no building matches "${query}".` : '';
+  addButton.textContent = `add "${query}"`;
+}
+
+// A building no one has scanned yet. It is saved together with the scan, not now,
+// so it works offline too.
+function addBuilding(name) {
+  const old = buildingList.querySelector('input[value="new"]');
+  if (old) old.parentElement.remove();   // one new building per scan
+  const label = buildingChoice('new', name, true);
+  buildingList.prepend(label);
+  label.querySelector('input').checked = true;
+  buildingFilter.value = '';
+  filterBuildings();
+  updatePicked();
+  picker.open = false;
+  document.getElementById('where').focus();   // the next thing to fill in
+}
+
+buildingFilter.addEventListener('input', filterBuildings);
+// Enter in the filter would send the whole form; here it means "add what I typed".
+buildingFilter.addEventListener('keydown', event => {
+  if (event.key !== 'Enter') return;
+  event.preventDefault();
+  if (!addButton.hidden) addBuilding(buildingFilter.value.trim());
+});
+addButton.addEventListener('click', () => addBuilding(buildingFilter.value.trim()));
+buildingList.addEventListener('change', updatePicked);
+
+// A tap on a building closes the accordion. Arrow keys pick too, but their clicks
+// have detail 0, so the list stays open while the keyboard moves through it.
+buildingList.addEventListener('click', event => {
+  if (event.detail > 0 && event.target.closest('label')) {
+    picker.open = false;
+    picker.querySelector('summary').focus();
+  }
+});
+
+// From the buildings page: ?building=b1 picks it, ?add=Warehouse%204 adds it,
+// ?add on its own goes straight to the filter to type a name.
 const params = new URLSearchParams(location.search);
-const building = buildings.find(b => b.id === params.get('building'));
-if (building) document.getElementById('building').value = building.name;
+const fromLink = buildingList.querySelector(`input[value="${CSS.escape(params.get('building') || '')}"]`);
+if (fromLink) {
+  fromLink.checked = true;
+  updatePicked();
+  picker.open = false;
+} else if (params.get('add')) {
+  addBuilding(params.get('add').trim());
+} else if (params.has('add')) {
+  buildingFilter.focus();
+}
 
 // One radio per probe. An offline probe can't be picked, and the line under it says why.
 let firstOnline = true;
@@ -249,9 +351,21 @@ document.getElementById('mode').addEventListener('change', () => {
 
 setupForm.addEventListener('submit', event => {
   event.preventDefault();   // stub: stay on this page instead of sending the form
-  walk.building = document.getElementById('building').value.trim();
+  const chosen = chosenBuilding();
+  if (!chosen) {
+    picker.open = true;
+    buildingNone.hidden = false;
+    buildingNone.textContent = 'choose a building, or type a name to add one.';
+    buildingFilter.focus();
+    return;
+  }
+  walk.building = chosen.parentElement.dataset.name;
+  walk.isNew = chosen.value === 'new';
+  walk.where = walk.isNew ? document.getElementById('where').value.trim() : '';
   walk.probe = setupForm.elements.probe.value;
-  // Later: create the scan in PocketBase, bind the probe to it, and send the probe
+  // Later: create the scan in PocketBase, and the building first if it is new
+  // (any technician may: the buildings createRule is just "@request.auth.id != ''").
+  // Offline, both wait on this phone and go up together. Then bind the probe, and send the probe
   // the password mode (and the one password). The password goes to the probe only, never to the database.
   show('stop');
   renderStop();
@@ -450,7 +564,8 @@ function showSummary() {
   const left = unvisited();
   const dl = document.getElementById('summary-list');
   dl.replaceChildren();
-  if (walk.building) addRow(dl, 'building', walk.building);
+  if (walk.building) addRow(dl, 'building', walk.building + (walk.isNew ? ' · new' : ''));
+  if (walk.where) addRow(dl, 'where', walk.where);
   addRow(dl, 'stops', String(walk.visited.length));
   addRow(dl, 'devices', String(walk.visited.length + left.length));
   if (walk.findings.length > 0) addRow(dl, 'findings', walk.findings.join(' · '));

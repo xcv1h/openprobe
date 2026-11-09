@@ -31,8 +31,28 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     <section id="setup">
       <h1 tabindex="-1">new scan</h1>
       <form id="setup-form">
-        <label for="building">building</label>
-        <input id="building" required>
+        <!-- Building: an accordion with a filter and the buildings in it.
+             When nothing matches, "add" makes a new one from what was typed. -->
+        <fieldset>
+          <legend>building</legend>
+          <details id="picker" class="picker" open>
+            <summary><span class="marker" aria-hidden="true">▸</span> <span id="picked" class="placeholder">choose a building</span></summary>
+            <div class="filter">
+              <label for="building-filter">filter</label>
+              <input id="building-filter" type="search" autocomplete="off" placeholder="building name">
+            </div>
+            <div id="building-list"><!-- walk.js adds one radio per building --></div>
+            <p id="building-none" class="help" aria-live="polite" hidden></p>
+            <p class="actions"><button id="add-building" type="button" hidden></button></p>
+          </details>
+        </fieldset>
+
+        <!-- Only for a new building -->
+        <div id="where-field" class="field" hidden>
+          <label for="where">where</label>
+          <input id="where" autocomplete="off" aria-describedby="where-help">
+          <p id="where-help" class="help">optional: where the switches are, e.g. basement B-012, key at reception.</p>
+        </div>
 
         <fieldset id="probes">
           <legend>probe</legend>

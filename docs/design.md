@@ -106,7 +106,7 @@ openprobe keeps the WAYSOD core — `ground`, `ink`, `signal` — and stays quie
 - Labels are plain words, never schema field names: `device`, `port`, `address`, `vlan` — not `device_id`, `local_port`, `mgmt_ip`, `native_vlan`.
 - Actions say what happens, as lowercase verb phrases: `start new scan`, `open last scan`, `start scan`, `finish scan`, `attach console`, `skip this switch`.
 - Times are relative: short in a collapsed row (`3d ago`), long when opened (`3 days ago by j.doe`).
-- An empty or error state says what to do next, not only what went wrong: "no buildings yet. add one in the PocketBase admin panel, then reload this page."
+- An empty or error state says what to do next, not only what went wrong: "no buildings yet. add the one you're in."
 - No emoji, no exclamation marks. The probe is diagnostic: never attack vocabulary (sniff, crawl, exploit, own).
 
 ### Visual foundations
@@ -153,7 +153,7 @@ openprobe keeps the WAYSOD core — `ground`, `ink`, `signal` — and stays quie
 
 `start new scan` opens the walk. This is where openprobe holds the technician's hand, so each screen answers one question: what do I do now?
 
-1. **setup** — building (already filled in), probe (with its StatusMark; an offline probe can't be picked, and the screen says why), console password: `none` / `one for all` / `ask per switch`. No pitch here: the technician already knows. Primary action: `start scan`.
+1. **setup** — building: already picked when the walk starts from a building row; otherwise an accordion holding a filter and the buildings as radio buttons. When the filter matches nothing it offers `add "<what was typed>"`, and a new building gets an optional `where`. A new building is saved with the scan, so it works offline; any technician can add one. Then probe (with its StatusMark; an offline probe can't be picked, and the screen says why), console password: `none` / `one for all` / `ask per switch`. No pitch here: the technician already knows. Primary action: `start scan`.
 2. **stop** — one screen per switch: StopSteps. The ask on top in `title`, the steps under it. The ask changes with the step:
 
    | step | mark | ask |
@@ -265,8 +265,9 @@ BuildingRow is one building in the buildings list: a native `<details>` accordio
 
 - List: `<ul class="op-rows" role="list">`, one `<li>` per building, a `line` hairline under each. (`role="list"` because Safari stops announcing an unstyled `<ul>` as a list.)
 - Collapsed line (`<summary>` → `span.op-row__line`, a grid of `1ch | name | 7ch | 7ch`): `▸` marker, name (truncates with …), StatusMark, relative time. Live scans show `● live` in the time column; never-scanned rows let `○ never scanned` take both columns. The grid is on an inner span because older Safari ignores grid on `<summary>`.
-- Opened (`div.op-row__more`, indented 2ch to sit under the name): a KeyValue — `where`, `devices` ("14 · 2 down · 1 stale"), `last scan` ("2 hours ago by j.doe"), `history` (the last four marks, oldest left), `unsent` — then `op-actions` with `open last scan` and `start new scan` (primary). Show only the lines there is data for; a never-scanned building gets only `start new scan`.
+- Opened (`div.op-row__more`, indented 2ch to sit under the name): a KeyValue — `where`, `devices` ("14 · 2 down · 1 stale"), `last scan` ("2 hours ago by j.doe"), `history` (the last four marks, oldest left), `unsent` — then `op-actions` with `open last scan` and `start new scan` (not primary: the page's primary is the `start new scan` above the Summary). Show only the lines there is data for; a never-scanned building gets only `start new scan`.
 - Sort trouble first: down, stale, never scanned, ok; then A to Z.
+- Above the Summary, `start new scan` (primary) opens the walk with no building picked. Under the list, `add building` opens the walk ready to type a name; when the filter matches nothing it reads `add "<what was typed>"` and opens the walk with that building added. It also serves the empty state.
 
 The consumer provides the building, its last scan's counts and the two links. Opening and closing needs no script.
 

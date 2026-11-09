@@ -28,6 +28,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
     <div>
       <h1>buildings</h1>
 
+      <!-- The page's one primary: a scan of any building, picked or added in the walk -->
+      <p class="actions top"><a class="primary" href="walk.html">start new scan</a></p>
+
       <!-- One sentence instead of a dashboard, e.g. "2 need attention · 1 unsent scan" -->
       <p id="overview" class="overview"></p>
       <div id="probes" class="probes"></div>
@@ -42,9 +45,10 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
       <p id="no-match" aria-live="polite"></p>
 
-      <p id="empty" hidden>
-        no buildings yet. add one in the PocketBase admin panel, then reload this page.
-      </p>
+      <p id="empty" hidden>no buildings yet. add the one you're in.</p>
+
+      <!-- Reads add "Warehouse 4" when the filter matches nothing (buildings.js) -->
+      <p class="actions"><a id="add" href="walk.html?add">add building</a></p>
     </div>
 
     <!-- Wide screens only: hidden on phones by the CSS -->
@@ -70,7 +74,7 @@ SPDX-License-Identifier: AGPL-3.0-or-later
           <dl></dl>
           <p class="actions">
             <a class="open">open last scan</a>
-            <a class="start primary">start new scan</a>
+            <a class="start">start new scan</a>
           </p>
         </div>
       </details>

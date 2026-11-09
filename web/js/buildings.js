@@ -290,6 +290,7 @@ function renderLog() {
 const list = document.getElementById('list');
 const filter = document.getElementById('filter');
 const noMatch = document.getElementById('no-match');
+const add = document.getElementById('add');
 
 // Hides rows whose name doesn't contain the typed text (case-insensitive).
 function applyFilter() {
@@ -299,7 +300,11 @@ function applyFilter() {
     li.hidden = !li.dataset.name.includes(query);
     if (!li.hidden) shown++;
   }
-  noMatch.textContent = shown === 0 ? `no building matches "${filter.value.trim()}"` : '';
+  const typed = filter.value.trim();
+  noMatch.textContent = shown === 0 ? `no building matches "${typed}"` : '';
+  // Nothing matches: offer what was typed, so the walk starts with it added.
+  add.textContent = shown === 0 ? `add "${typed}"` : 'add building';
+  add.href = shown === 0 ? 'walk.html?add=' + encodeURIComponent(typed) : 'walk.html?add';
 }
 
 if (buildings.length === 0) {

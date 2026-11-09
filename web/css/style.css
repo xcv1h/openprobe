@@ -152,7 +152,8 @@ button, .actions a {
 }
 button:hover, .actions a:hover { background: var(--surface-raised); }
 /* The one thing a screen is for: inverted ink. Never red, red means broken. */
-.primary, .primary:hover { background: var(--action); color: var(--on-action); border-color: var(--action); }
+/* ".actions .primary" because ".actions a" above would otherwise win and draw it plain */
+.primary, .primary:hover, .actions .primary, .actions .primary:hover { background: var(--action); color: var(--on-action); border-color: var(--action); }
 
 .actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin: var(--space-4) 0 0; }
 
@@ -304,8 +305,23 @@ legend { color: var(--ink-muted); padding: 0; }
 .choice.disabled { color: var(--ink-muted); cursor: not-allowed; }
 input[type="radio"] { width: 1.25em; height: 1.25em; margin: 0; padding: 0; border: 0; accent-color: var(--ink); }
 input[type="radio"]:focus-visible { outline: var(--border-focus) solid var(--focus); outline-offset: 2px; }   /* input:focus above removes it */
-.field { display: grid; gap: var(--space-2); }
+.field { display: grid; gap: var(--space-2); margin-bottom: var(--space-4); }
+.field input { margin-bottom: 0; }   /* the field keeps the space instead, so help text sits right under the input */
 .help { color: var(--ink-muted); margin: 0 0 var(--space-2); }
+
+/* Scan walk: the building picker, an accordion with the filter and the buildings inside */
+.picker summary {
+  list-style: none;
+  cursor: pointer;
+  padding: 10px 0;   /* 44px tall, like an input */
+  border-bottom: var(--border-hair) solid var(--line-strong);   /* a control's edge */
+}
+.picker summary::-webkit-details-marker { display: none; }   /* Safari's own arrow */
+.picker .placeholder, .new { color: var(--ink-muted); }
+.picker .filter { margin: var(--space-2) 0; }
+
+/* Buildings page: "start new scan" on top */
+.top { margin: 0 0 var(--space-6); }
 
 /* Focus moved here by the script when a screen appears: no outline, it's not something you clicked */
 [tabindex="-1"]:focus { outline: none; }
