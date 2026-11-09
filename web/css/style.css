@@ -4,17 +4,67 @@
  * SPDX-License-Identifier: AGPL-3.0-or-later
  */
 
-:root {
-  --bg: #0A0A0A;
-  --fg: #EBEBEB;
-  --red: #FF2A2A;
-  --dim: rgba(235, 235, 235, 0.55);   /* --fg faded: labels, secondary text */
-  --rule: rgba(235, 235, 235, 0.15);  /* --fg faded more: hairlines */
+/* Self-hosted so the app still has its font in a basement with no signal.
+   One variable file covers every weight and width. Licence: SIL OFL 1.1. */
+@font-face {
+  font-family: "Martian Mono";
+  src: url("../fonts/MartianMono-Variable.woff2") format("woff2");
+  font-weight: 100 800;
+  font-stretch: 75% 112.5%;
+  font-display: swap;   /* show the fallback mono at once, swap when the file has loaded */
+}
 
-  /* Status colours: the only colour on the page. Always shown with an icon and a word too. */
-  --status-down: var(--red);
-  --status-stale: var(--fg);
-  --status-ok: var(--dim);
+/* Tokens from docs/design.md. Don't add colours outside these. */
+:root {
+  /* colour (dark theme; light is not shipped yet) */
+  --ground: #0A0A0A;
+  --surface-raised: #151515;
+  --well: #000000;
+  --well-ink: #EBEBEB;
+  --well-muted: #8C8C8C;
+  --line: #2B2B2B;
+  --line-strong: #666666;
+  --ink: #EBEBEB;
+  --ink-muted: #9C9C9C;
+  --action: var(--ink);
+  --on-action: var(--ground);
+  --signal: #FF2A2A;
+  --on-signal: #0A0A0A;
+  --signal-ink: #FF4D4D;
+  --signal-soft: #2A0D0D;
+  --wire-orange: #FF8A1F;
+  --wire-brown: #C08A55;
+  --wire-green: #3FD47A;
+  --wire-blue: #6B93FF;
+  --wire-white: #EBEBEB;
+  --console: #6EC6F0;
+  --on-console: #0A0A0A;
+  --console-soft: #0B2230;
+  --focus: var(--ink);
+  --link: var(--ink);
+
+  /* type */
+  --font-display: "Martian Mono", ui-monospace, Menlo, Consolas, "DejaVu Sans Mono", monospace;
+  --font-mono: "Martian Mono", ui-monospace, Menlo, Consolas, "DejaVu Sans Mono", monospace;
+
+  /* spacing */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --tap-min: 44px;
+  --row-min: 48px;
+
+  /* radius */
+  --radius-none: 0;
+  --radius-pill: 999px;
+
+  /* border */
+  --border-hair: 1px;
+  --border-wire: 4px;
+  --border-focus: 2px;
 
   color-scheme: dark;                  /* dark scrollbars and form controls */
 }
@@ -25,9 +75,9 @@
 [hidden] { display: none !important; }
 
 html {
-  background: var(--bg);
-  color: var(--fg);
-  font: 16px/1.5 ui-monospace, Menlo, Consolas, "DejaVu Sans Mono", monospace;   /* 16px also stops iOS zooming into inputs */
+  background: var(--ground);
+  color: var(--ink);
+  font: 16px/1.5 var(--font-mono);   /* 16px also stops iOS zooming into inputs */
 }
 
 /* Big monitors: 16px monospace looks tiny there */
@@ -37,10 +87,10 @@ html {
 
 body { margin: 0; }
 
-a { color: inherit; text-underline-offset: 3px; }
+a { color: var(--link); text-underline-offset: 3px; }
 
 /* Keyboard focus: a clear outline on anything you can tab to */
-:focus-visible { outline: 2px solid var(--fg); outline-offset: 2px; }
+:focus-visible { outline: var(--border-focus) solid var(--focus); outline-offset: 2px; }
 
 /* The header runs edge to edge; the page content is a centred column below it */
 header { padding: 0 16px; }
@@ -62,87 +112,137 @@ header {
   gap: 0 16px;
   padding-top: 6px;
   padding-bottom: 6px;
-  border-bottom: 1px solid var(--rule);
+  border-bottom: 1px solid var(--line);
 }
 header a { text-decoration: none; padding: 10px 0; }   /* 24px line + 20px padding = 44px tap target */
 nav { display: flex; gap: 16px; }
-nav a { color: var(--dim); }
-nav a[aria-current="page"] { color: var(--fg); }
+nav a { color: var(--ink-muted); }
+nav a[aria-current="page"] { color: var(--ink); }
 
-h1 { font-size: 1.4rem; margin: 32px 0 8px; }
-h2 { font-size: 1rem; font-weight: normal; color: var(--dim); margin: 32px 0 8px; }
+h1 { font: 700 1.4rem/1.5 var(--font-display); margin: 32px 0 8px; }
+h2 { font-size: 1rem; font-weight: normal; color: var(--ink-muted); margin: 32px 0 8px; }
 
-/* Tables: a hairline under each row, nothing else */
+/* A device name never breaks at its hyphens: SW-ACCESS-01 stays on one line */
+.dev { white-space: nowrap; }
+
+/* Status is brightness first: quiet when fine, ink when it wants a look, red only when broken.
+   Always an icon and a word too, so colour never carries the meaning alone. */
+.status { white-space: nowrap; }
+.status.ok, .status.never, .status.offline { color: var(--ink-muted); }
+.status.stale, .status.live { color: var(--ink); }
+.status.down { color: var(--signal-ink); }
+
+/* "● live" breathes slowly while a probe is scanning */
+@keyframes pulse { 50% { opacity: 0.3; } }
+.pulse { animation: pulse 2s ease-in-out infinite; }
+
+/* Buttons: links and buttons look the same. Square corners, at least 44px tall. */
+button, .actions a {
+  display: inline-flex;
+  align-items: center;
+  min-height: var(--tap-min);
+  padding: 0 var(--space-4);
+  border: var(--border-hair) solid var(--line-strong);
+  border-radius: var(--radius-none);
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  text-decoration: none;
+  cursor: pointer;
+}
+button:hover, .actions a:hover { background: var(--surface-raised); }
+/* The one thing a screen is for: inverted ink. Never red, red means broken. */
+.primary, .primary:hover { background: var(--action); color: var(--on-action); border-color: var(--action); }
+
+.actions { display: flex; flex-wrap: wrap; gap: var(--space-3); margin: var(--space-4) 0 0; }
+
+/* Tables: a hairline under each row, nothing else. Rows are never coloured by status. */
 .scroll { overflow-x: auto; }   /* a wide table scrolls sideways on a phone, the page doesn't */
 table { border-collapse: collapse; margin-top: 16px; }   /* as wide as its columns, not the screen */
 th, td {
   text-align: left;
   white-space: nowrap;
   padding: 8px 24px 8px 0;
-  border-bottom: 1px solid var(--rule);
+  border-bottom: 1px solid var(--line);
 }
-th { font-weight: normal; color: var(--dim); }
+th { font-weight: normal; color: var(--ink-muted); }
 
-/* Red: a device older than its CDP holdtime, or something live */
-.stale td { color: var(--dim); }
-.stale .seen, .live { color: var(--red); }
+/* A device only heard from a neighbour: its values are second-hand until a stop confirms them */
+.heard td { color: var(--wire-brown); }
+.heard td.stop { color: var(--ink-muted); }   /* "not yet" */
 
-/* Probe page */
-dl { display: grid; grid-template-columns: max-content 1fr; gap: 8px 24px; margin: 24px 0 0; }
-dt { color: var(--dim); }
-dd { margin: 0; }
+/* Label | value lists: fixed label width, so every list lines up the same */
+dl { display: grid; grid-template-columns: 10ch 1fr; gap: 4px 1ch; margin: 24px 0 0; }
+dt { color: var(--ink-muted); }
+dd { margin: 0; overflow-wrap: anywhere; }   /* a long address wraps instead of scrolling sideways */
+
+/* Probe page console: a session bar over a black well, like a terminal */
+.console-bar {
+  display: flex;
+  flex-wrap: wrap;   /* on a phone "via tunnel" drops to its own line */
+  justify-content: space-between;
+  gap: 0 1ch;
+  padding: var(--space-2) var(--space-4);
+  background: var(--console-soft);
+  color: var(--console);
+}
 #console {
   font: inherit;          /* <pre> would otherwise drop to the browser's small default monospace */
-  min-height: 16em;
+  min-height: 24em;       /* 16 lines at line-height 1.5 */
   margin: 0;
-  padding: 16px 0;
-  border-top: 1px solid var(--rule);
-  border-bottom: 1px solid var(--rule);
+  padding: var(--space-4);
+  background: var(--well);
+  color: var(--well-ink);
+  overflow-x: auto;       /* long IOS lines scroll inside the well, not the page */
 }
+#console .p { color: var(--well-muted); }   /* prompts and timestamps */
 
 /* Login page */
 .login { max-width: 24rem; padding-top: 20vh; }
+.wordmark { font: 800 2rem/1.2 var(--font-display); }
+.pitch { color: var(--ink-muted); margin-top: var(--space-6); }
+
+/* The wire rule: four conductors in T568B order. Only under the login wordmark. */
+.wire { display: grid; gap: 2px; width: 24ch; max-width: 100%; margin-bottom: var(--space-8); }
+.wire i { display: block; height: var(--border-wire); border-radius: var(--radius-pill); }
+.wire .wo { background: repeating-linear-gradient(90deg, var(--wire-orange) 0 12px, var(--wire-white) 12px 20px); }
+.wire .o  { background: var(--wire-orange); }
+.wire .wg { background: repeating-linear-gradient(90deg, var(--wire-green) 0 12px, var(--wire-white) 12px 20px); }
+.wire .b  { background: var(--wire-blue); }
+
 form { display: grid; gap: 8px; }
-label { color: var(--dim); }
+label { color: var(--ink-muted); }
 input {
   font: inherit;
   color: inherit;
   background: none;
   border: 0;
-  border-bottom: 1px solid var(--rule);
+  border-bottom: 1px solid var(--line-strong);
   padding: 10px 0;   /* 44px tall */
   margin-bottom: 16px;
 }
-input:focus { outline: none; border-bottom-color: var(--fg); }
-button {
-  justify-self: start;
-  font: inherit;
-  color: var(--bg);
-  background: var(--fg);
-  border: 0;
-  padding: 8px 16px;
-  cursor: pointer;
-}
+input:focus { outline: none; border-bottom-color: var(--ink); }   /* inputs show focus with their underline */
+form button { justify-self: start; }
 
 /* Buildings page */
-.overview { color: var(--dim); margin: 0; }
+.overview { color: var(--ink-muted); margin: 0; }
 
 /* Probe lines under the overview: online in normal text, offline dimmed */
 .probes { margin-bottom: 24px; }
 .probes p { margin: 0; }
-.probes .offline { color: var(--dim); }
-#no-match { color: var(--dim); }
+.probes .offline { color: var(--ink-muted); }
+#no-match { color: var(--ink-muted); }
 
 /* Filter: label and input on one line, like a prompt */
-.filter { display: flex; align-items: center; gap: 1ch; border-bottom: 1px solid var(--dim); }
-.filter:focus-within { border-bottom-color: var(--fg); }
-.filter label { color: var(--dim); }
+.filter { display: flex; align-items: center; gap: 1ch; border-bottom: 1px solid var(--line-strong); }
+.filter:focus-within { border-bottom-color: var(--ink); }
+.filter label { color: var(--ink-muted); }
 .filter input { flex: 1; min-width: 0; border: 0; margin: 0; }
-.filter input::placeholder { color: var(--dim); }
+.filter input::placeholder { color: var(--ink-muted); }
 
 /* The list: rows separated by a hairline, no boxes */
 .buildings { list-style: none; margin: 0; padding: 0; }
-.buildings li { border-bottom: 1px solid var(--rule); }
+.buildings li { border-bottom: 1px solid var(--line); }
 
 .buildings summary { list-style: none; cursor: pointer; }
 .buildings summary::-webkit-details-marker { display: none; }   /* Safari's own arrow */
@@ -156,42 +256,20 @@ button {
   align-items: center;
   min-height: 48px;   /* tap target */
 }
-.marker { color: var(--dim); transition: transform 0.15s; }
+.marker { color: var(--ink-muted); transition: transform 0.15s; }
 details[open] .marker { transform: rotate(90deg); }   /* ▸ turns into ▾ */
 .name {
   overflow: hidden;   /* a long name ends in "…" instead of widening the page */
   text-overflow: ellipsis;
   white-space: nowrap;
 }
-.line .status, .when { white-space: nowrap; }
 .line .status.never { grid-column: span 2; }   /* "never scanned" also takes the empty time column */
-.when { text-align: right; }
-.when time { color: var(--dim); }   /* "3d ago" is dimmed, "● live" stays normal text */
-
-.status.down  { color: var(--status-down); }
-.status.stale { color: var(--status-stale); }
-.status.ok    { color: var(--status-ok); }
-.status.never { color: var(--dim); }
-
-/* "● live" breathes slowly while a probe is scanning */
-@keyframes pulse { 50% { opacity: 0.3; } }
-.pulse { animation: pulse 2s ease-in-out infinite; }
+.when { text-align: right; white-space: nowrap; }
+.when time { color: var(--ink-muted); }   /* "3d ago" is dimmed, "● live" stays normal text */
 
 /* The opened part, indented to line up with the building name (1ch marker + 1ch gap) */
 .more { padding: 0 0 16px 2ch; }
-.more dl { margin: 0; gap: 4px 1ch; grid-template-columns: 10ch 1fr; }   /* fixed label width, same in every row */
-.more dd { overflow-wrap: anywhere; }   /* a long address wraps instead of scrolling sideways */
-
-.actions { display: flex; flex-wrap: wrap; gap: 12px; margin: 16px 0 0; }
-.actions a {
-  display: inline-flex;
-  align-items: center;
-  min-height: 44px;
-  padding: 0 16px;
-  border: 1px solid var(--dim);
-  text-decoration: none;
-}
-.actions a.primary { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.more dl { margin: 0; }
 
 /* Activity log: hidden on phones, beside the list on wide screens */
 .log { display: none; }
@@ -213,9 +291,55 @@ details[open] .marker { transform: rotate(90deg); }   /* ▸ turns into ▾ */
   padding: 4px 0;
   white-space: nowrap;
 }
-.log-list .at, .log-list .who { color: var(--dim); }
+.log-list .at, .log-list .who { color: var(--ink-muted); }
 .log-list .what { overflow: hidden; text-overflow: ellipsis; }
 
+/* Read by screen readers, not shown: the state word beside a step's glyph */
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* Scan walk: setup. A choice of a few options is radio buttons, one per line. */
+fieldset { border: 0; margin: 0 0 var(--space-4); padding: 0; min-width: 0; }
+legend { color: var(--ink-muted); padding: 0; }
+.choice { display: flex; align-items: center; gap: 1ch; min-height: var(--tap-min); color: var(--ink); cursor: pointer; }
+.choice.disabled { color: var(--ink-muted); cursor: not-allowed; }
+input[type="radio"] { width: 1.25em; height: 1.25em; margin: 0; padding: 0; border: 0; accent-color: var(--ink); }
+input[type="radio"]:focus-visible { outline: var(--border-focus) solid var(--focus); outline-offset: 2px; }   /* input:focus above removes it */
+.field { display: grid; gap: var(--space-2); }
+.help { color: var(--ink-muted); margin: 0 0 var(--space-2); }
+
+/* Focus moved here by the script when a screen appears: no outline, it's not something you clicked */
+[tabindex="-1"]:focus { outline: none; }
+
+/* Scan walk: one switch per screen. The ask on top in big type, the steps under it. */
+.count { color: var(--ink-muted); margin: var(--space-8) 0 0; }
+.ask { font: 700 1.4rem/1.5 var(--font-display); margin: var(--space-2) 0 var(--space-6); }
+.ask.is-failed { color: var(--signal-ink); }
+.ask.is-finding { color: var(--wire-orange); }
+.steps { list-style: none; margin: 0 0 var(--space-4); padding: 0; }
+.steps li { display: grid; grid-template-columns: 1ch minmax(0, 1fr); gap: 1ch; padding: var(--space-1) 0; color: var(--ink-muted); }
+.steps .is-now, .steps .is-stale { color: var(--ink); }
+.steps .is-failed { color: var(--signal-ink); }
+.steps .is-finding { color: var(--wire-orange); }
+.note { display: block; color: var(--ink); }   /* a step's result: "9600 8N1", "2 neighbors" */
+
+/* Where to walk next. On a phone "from SW-CORE-01 Gi1/0/2" wraps under the name instead of squeezing it. */
+.next { list-style: none; margin: 0; padding: 0; }
+.next li {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  align-content: center;
+  column-gap: 1ch;
+  min-height: var(--row-min);
+  padding: var(--space-2) 0;
+  border-bottom: var(--border-hair) solid var(--line);
+}
+.via { color: var(--ink-muted); white-space: nowrap; }
+
+/* Stub controls stand in for the probe until it's connected. Delete with them. */
+.stub { margin-top: var(--space-8); border-top: var(--border-hair) solid var(--line); }
+
+/* Motion means "happening now". People who asked for less motion get the word without it. */
 @media (prefers-reduced-motion: reduce) {
   .marker { transition: none; }
   .pulse { animation: none; }

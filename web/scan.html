@@ -24,26 +24,37 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 
   <main>
     <h1><a href="buildings.html">buildings</a> / Building B</h1>
-    <p class="live">● live</p>
+    <p class="status live"><span class="pulse" aria-hidden="true">●</span> live</p>
 
-    <!-- One row per record in `devices` where scan = this scan.
-         A row older than its CDP holdtime gets class="stale". Placeholder rows. -->
-    <div class="scroll">
+    <!-- One row per record in `devices` where scan = this scan, sorted by stop, then name.
+         A device only heard from a neighbour has no stop yet: class="heard", sorted last.
+         A device older than its CDP holdtime gets "▲ stale" beside its stop. Placeholder rows. -->
+    <!-- tabindex and a label so keyboard users can focus the table and scroll it sideways -->
+    <div class="scroll" tabindex="0" role="region" aria-label="devices">
       <table>
         <thead>
           <tr>
-            <th>device_id</th><th>local_port</th><th>platform</th><th>version</th>
-            <th>mgmt_ip</th><th>native_vlan</th><th>capabilities</th><th>updated</th>
+            <th>device</th><th>port</th><th>platform</th><th>version</th>
+            <th>address</th><th>vlan</th><th>stop</th>
           </tr>
         </thead>
         <tbody>
           <tr>
-            <td>SW-ACCESS-01</td><td>GigabitEthernet1/0/24</td><td>cisco WS-C2960X-24TS-L</td><td>15.2(7)E8</td>
-            <td>10.0.0.2</td><td>1</td><td>S I</td><td class="seen">12s ago</td>
+            <td>SW-CORE-01</td><td>GigabitEthernet1/0/1</td><td>cisco WS-C3850-24T</td><td>16.12.4</td>
+            <td>10.0.0.3</td><td>1</td>
+            <td class="stop">stop 1 <span class="status stale"><span aria-hidden="true">▲</span> stale</span></td>
           </tr>
-          <tr class="stale">
+          <tr>
+            <td>SW-ACCESS-01</td><td>GigabitEthernet1/0/24</td><td>cisco WS-C2960X-24TS-L</td><td>15.2(7)E8</td>
+            <td>10.0.0.2</td><td>1</td><td class="stop">stop 2</td>
+          </tr>
+          <tr class="heard">
             <td>RTR-EDGE-01</td><td>GigabitEthernet0/1</td><td>cisco CISCO1941/K9</td><td>15.7(3)M8</td>
-            <td>10.0.0.1</td><td>1</td><td>R B S I</td><td class="seen">6m ago</td>
+            <td>10.0.0.1</td><td>1</td><td class="stop">not yet</td>
+          </tr>
+          <tr class="heard">
+            <td>SW-ACCESS-02</td><td>GigabitEthernet1/0/2</td><td>cisco WS-C2960X-48TS-L</td><td>15.2(7)E8</td>
+            <td>10.0.0.4</td><td>1</td><td class="stop">not yet</td>
           </tr>
         </tbody>
       </table>

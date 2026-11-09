@@ -14,7 +14,9 @@ SPDX-License-Identifier: AGPL-3.0-or-later
 </head>
 <body>
   <main class="login">
-    <h1>openprobe</h1>
+    <h1 class="wordmark">openprobe</h1>
+    <!-- Decoration only: four conductors of a network cable -->
+    <div class="wire" aria-hidden="true"><i class="wo"></i><i class="o"></i><i class="wg"></i><i class="b"></i></div>
 
     <!-- Placeholder: submitting just opens the buildings list.
          Later: pb.collection('users').authWithPassword(email, password) -->
@@ -25,8 +27,10 @@ SPDX-License-Identifier: AGPL-3.0-or-later
       <label for="password">password</label>
       <input id="password" type="password">
 
-      <button>log in</button>
+      <button class="primary">log in</button>
     </form>
+
+    <p class="pitch">the console password is all it needs.</p>
   </main>
 </body>
 </html>

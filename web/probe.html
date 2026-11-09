@@ -25,16 +25,21 @@ SPDX-License-Identifier: AGPL-3.0-or-later
   <main>
     <h1>probe</h1>
 
-    <!-- Placeholder values. -->
+    <!-- Placeholder values. Online while bound to a running scan, so it pulses.
+         Idle would be class="status ok" (quiet), offline "○ offline" in class="status offline". -->
     <dl>
-      <dt>status</dt>     <dd class="live">● online</dd>
+      <dt>status</dt>     <dd class="status live"><span class="pulse" aria-hidden="true">●</span> online</dd>
       <dt>bound scan</dt> <dd><a href="scan.html">Building B</a></dd>
-      <dt>last frame</dt> <dd>12s ago, SW-ACCESS-01 GigabitEthernet1/0/24</dd>
+      <dt>last frame</dt> <dd>12s ago, <span class="dev">SW-ACCESS-01</span> GigabitEthernet1/0/24</dd>
     </dl>
 
     <h2>console</h2>
+    <div class="console-bar">
+      <span><span aria-hidden="true">●</span> console · 9600 8N1 · <span class="dev">SW-ACCESS-01</span></span>
+      <span>via tunnel</span>
+    </div>
     <!-- xterm.js goes here. Bytes come over the reverse WebSocket relayed by the PocketBase host. -->
-    <pre id="console">SW-ACCESS-01&gt;</pre>
+    <pre id="console"><span class="p">SW-ACCESS-01&gt;</span></pre>
   </main>
 </body>
 </html>

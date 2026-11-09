@@ -182,7 +182,7 @@ function renderRow(b) {
   const open = li.querySelector('.open');
   if (last) open.href = 'scan.html?id=' + encodeURIComponent(last.id);
   else open.hidden = true;
-  li.querySelector('.start').href = 'probe.html?building=' + encodeURIComponent(b.id);
+  li.querySelector('.start').href = 'walk.html?building=' + encodeURIComponent(b.id);
 
   return li;
 }

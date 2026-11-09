@@ -1,0 +1,115 @@
+<!--
+SPDX-FileCopyrightText: 2026 Tymofii Zhurida (xcv1h) zhuridatimofii@gmail.com
+
+SPDX-License-Identifier: AGPL-3.0-or-later
+-->
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>new scan · openprobe</title>
+  <link rel="stylesheet" href="css/style.css">
+  <script src="js/walk.js" defer></script>
+</head>
+<body>
+  <header>
+    <a href="buildings.html">openprobe</a>
+    <nav>
+      <a href="buildings.html">buildings</a>
+      <a href="probe.html">probe</a>
+      <a href="index.html">log out</a>
+    </nav>
+  </header>
+
+  <!-- Three screens on one page; walk.js shows one at a time.
+       Each screen's tabindex="-1" element is where focus goes when it appears. -->
+  <main class="narrow">
+
+    <!-- 1. Setup -->
+    <section id="setup">
+      <h1 tabindex="-1">new scan</h1>
+      <form id="setup-form">
+        <label for="building">building</label>
+        <input id="building" required>
+
+        <fieldset id="probes">
+          <legend>probe</legend>
+          <!-- walk.js adds one radio per probe -->
+        </fieldset>
+
+        <fieldset id="mode">
+          <legend>console password</legend>
+          <label class="choice"><input type="radio" name="mode" value="none"> none</label>
+          <label class="choice"><input type="radio" name="mode" value="one" checked> one for all</label>
+          <label class="choice"><input type="radio" name="mode" value="ask"> ask per switch</label>
+        </fieldset>
+
+        <div id="one-password-field" class="field">
+          <label for="one-password">password for every switch</label>
+          <input id="one-password" type="password" autocomplete="off" required>
+        </div>
+
+        <button class="primary">start scan</button>
+      </form>
+    </section>
+
+    <!-- 2. One stop: the ask on top, the steps under it -->
+    <section id="stop" hidden>
+      <p id="count" class="count" tabindex="-1"></p>
+      <p id="ask" class="ask" aria-live="polite"></p>
+      <ol id="steps" class="steps" role="list"></ol>
+
+      <!-- Only in "ask per switch", or after a failed login -->
+      <form id="password-form" class="field" hidden>
+        <label for="switch-password">console password</label>
+        <input id="switch-password" type="password" autocomplete="off" required>
+        <button class="primary">log in</button>
+      </form>
+
+      <!-- Where to walk next: only once the stop is done -->
+      <div id="next" hidden>
+        <div id="next-here">
+          <h2>not scanned yet</h2>
+          <p class="help">follow the cable from these ports.</p>
+          <ul id="next-here-list" class="next" role="list"></ul>
+        </div>
+        <div id="next-earlier">
+          <h2>still not scanned</h2>
+          <ul id="next-earlier-list" class="next" role="list"></ul>
+        </div>
+        <p id="next-empty">every neighbor has been scanned. finish the scan, or keep going.</p>
+      </div>
+
+      <!-- walk.js shows only the buttons that make sense now; "finish scan" is always there -->
+      <p class="actions">
+        <button id="retry" type="button"></button>
+        <button id="keep" type="button"></button>
+        <button id="skip" type="button"></button>
+        <button id="finish" type="button">finish scan</button>
+      </p>
+
+      <!-- Stub only: stands in for the probe. Delete when the probe sends real events. -->
+      <div class="stub">
+        <h2>stub</h2>
+        <p class="help">no probe yet: click through the states, or show a failure or finding.</p>
+        <p class="actions">
+          <button id="next-state" type="button">next state</button>
+        </p>
+        <p id="cases" class="actions"></p>
+      </div>
+    </section>
+
+    <!-- 3. Summary -->
+    <section id="summary" hidden>
+      <h1 tabindex="-1">scan finished</h1>
+      <dl id="summary-list"></dl>
+      <p class="actions">
+        <a class="primary" href="buildings.html">back to buildings</a>
+      </p>
+    </section>
+
+  </main>
+</body>
+</html>

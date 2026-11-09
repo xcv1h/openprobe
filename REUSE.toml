@@ -1,6 +1,11 @@
 version = 1
 
 [[annotations]]
-path = ["LICENSE", "README.md", "**/.gitkeep"]
+path = ["LICENSE", "README.md", "**/.gitkeep", ".gitignore", "docs/design.md"]
 SPDX-FileCopyrightText = "2026 Tymofii Zhurida (xcv1h) zhuridatimofii@gmail.com"
 SPDX-License-Identifier = "CC-BY-SA-4.0"
+
+[[annotations]]
+path = ["web/fonts/**"]
+SPDX-FileCopyrightText = "2021 The Martian Mono Project Authors (https://github.com/evilmartians/mono)"
+SPDX-License-Identifier = "OFL-1.1"
